@@ -2,7 +2,6 @@
 *.DS_Store
 *.pyc
 *.so
-*.pkl
 *.egg-info/
 *.pdf
 build/
