@@ -32,7 +32,7 @@ $ deactivate
 ```
 
 # Examples
-To generate the figures for the paper, run the Jupyter notebook:
+To generate the figures for the paper, run the following Jupyter notebooks. For `Revision_main.ipynb` and `Revision_exemplar`, most of the cells rely on saved data and can be run immediately. `Dynamics_polished` should run in about 15 minutes.
 
 ```
 sims/Revision_main.ipynb

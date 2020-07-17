@@ -2,7 +2,7 @@ cfg_mk = {
     'diff_area_noise': False,  # Add selective recurrent noise to areas
     'area_noise': 3,
 
-    'linear_mut_info': True,
+    'linear_mut_info': False, #True if you want the linear decoder
 
     'path': '/Users/michael/Documents/GitHub/multi-area-cleaned/',
     'rnn_datapath': '/Users/michael/Documents/GitHub/multi-area-cleaned/saved_rnns_server_apr/data/',
