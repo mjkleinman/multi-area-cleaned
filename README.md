@@ -1,14 +1,9 @@
 # Recurrent neural network models of multi-area computation underlying decision-making
 
-This Python package trains and analyzes multi-area RNNs. It trains RNNs by expanding on the pycog repository (https://github.com/frsong/pycog). This was written using Python 2.7.17.
+This Python package trains and analyzes multi-area RNNs. It trains RNNs by expanding on the pycog repository (https://github.com/frsong/pycog). Our package was written using Python 2.7.17.
 
-- [Overview](#overview)
 - [Installation Guide](#installation-guide)
 - [Examples](#examples)
-
-# Overview
-We train and analyze multi-area RNNs.
-
 
 # Installation Guide:
 
@@ -35,7 +30,7 @@ $ deactivate
 ```
 
 # Examples
-To generate the figures, run the Jupyter notebook:
+To generate the figures for the paper, run the Jupyter notebook:
 
 ```
 sims/Revision (Finalized).ipynb
