@@ -983,6 +983,7 @@ class dPCA(BaseEstimator):
         """
         return self.inverse_transform(self.transform(X,marginalization),marginalization)
 
+    # MK: get variance captured (surprisingly, it doesn't come with the code)
     def calculate_variance(self, X):
         Xr = X.reshape(X.shape[0], -1)
         Xzm = - np.mean(Xr, axis=1).reshape(-1, 1) + Xr
