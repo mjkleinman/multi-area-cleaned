@@ -1,49 +1,58 @@
 # Recurrent neural network models of multi-area computation underlying decision-making
 
-This Python package trains and analyzes multi-area RNNs. It trains RNNs by expanding on the pycog repository (https://github.com/frsong/pycog).
+This Python package trains and analyzes multi-area RNNs. It trains RNNs by expanding on the pycog repository (https://github.com/frsong/pycog). This was written using Python 2.7.17.
 
 - [Overview](#overview)
-- [System Requirements](#system-requirements)
 - [Installation Guide](#installation-guide)
+- [Examples](#examples)
 
 # Overview
 We train and analyze multi-area RNNs.
 
-# Documenation
-
-# System Requirements
-The code mainly depends on the Python scientific stack.
-
-```
-numpy
-Theano
-matplotlib
-```
 
 # Installation Guide:
 In a virtual environment, using Python 2.7.17, install the dependencies
 
+1. Create a virtual environment
+```
+$ virtualenv --system-site-packages -p python2.7 your-virtual-env-name
+$ source your-virtual-env-name/bin/activate
+```
+
+When you are finished working in the virtual environment, run:
+```
+$ deactivate
+```
+
+2. Install the dependencies
 ```
 pip install -r requirements.txt
 ```
+
 # examples
-
-
+To generate the figures, run the Jupyter notebook:
 
 ```
-python do.py models/2020-04-10_cb_simple_3areas.py train
+sims/Revision (Finalized).ipynb
+sims/Revision [exemplar].ipynb
+dynamics.ipynb
 ```
 
-To run the hyperparameter sweeps to get mutual information and dpca variance:
+These `sims/Revision (Finalized).ipynb` used saved values for the hyperparameter sweeps. The mutual information and dpca variance values are generated using
+
 ```
 python sims/get_mutualinfo_vals.sh
 python sims/get_dpca_vals.sh
 ```
-To generate the figures, run:
 
+A network is trained by running
 ```
-sims/Revision (Finalized).ipynb
+python do.py models/2020-04-10_cb_simple_3areas.py train
 ```
 
+Multiple networks are trained by running:
+```
+python sims/three_rnn_train.py
+```
 
 
