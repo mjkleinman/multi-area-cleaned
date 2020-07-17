@@ -1412,6 +1412,56 @@ class PSTH(Trial):
 
         return pds
 
+    # Targeted dimensionality reduction
+    def tdr(self, idx1=np.hstack((np.arange(80), np.arange(240, 260))), idx2=np.hstack((np.arange(80, 160), np.arange(260, 280))), idx3=np.hstack((np.arange(160, 240), np.arange(280, 300)))):
+
+        ntrials = self.ntrials
+        nunits = 300
+        ntime = 260
+        rates = np.zeros((nunits, ntrials, ntime))
+        for i in range(ntrials):
+            rates[:, i, :] = self.trials[i]['r'][:, :ntime]
+        zrates = rates
+
+        # compute the units zscore across trial and time
+        m = np.mean(zrates, axis=(1, 2))
+        std = np.std(zrates, axis=(1, 2))
+        zrates2 = (zrates.reshape(nunits, ntrials * ntime) - m.reshape(nunits, 1)).reshape(nunits, ntrials, ntime)
+        zrates3 = (zrates2.reshape(nunits, ntrials * ntime) / std.reshape(nunits, 1)).reshape(nunits, ntrials, ntime)
+
+
+        ncoef = 4
+        F = np.zeros((ncoef, ntrials))
+        F[0, :] = self.choices
+        F[1, :] = self.scols
+        F[2, :] = self.lrs
+        F[3, :] = 1
+
+        A = np.linalg.inv(F.dot(F.T)).dot(F)
+        betas = np.tensordot(A, np.swapaxes(rates, 0, 1), axes=([1], [0]))
+
+        maxind1 = {}
+        maxind2 = {}
+        maxind3 = {}
+        for j in range(ncoef):
+            maxnorm1 = 0
+            maxnorm2 = 0
+            maxnorm3 = 0
+            for i in range(ntime):
+                temp1 = np.linalg.norm(betas[j, idx1, i])
+                temp2 = np.linalg.norm(betas[j, idx2, i])
+                temp3 = np.linalg.norm(betas[j, idx3, i])
+                if temp1 > maxnorm1:
+                    maxnorm1 = temp1
+                    maxind1[j] = i
+                if temp2 > maxnorm2:
+                    maxnorm2 = temp2
+                    maxind2[j] = i
+                if temp3 > maxnorm3:
+                    maxnorm3 = temp3
+            maxind3[j] = i
+        return betas, maxind1, maxind2, maxind3
+
     # ============================
     # Choice probability functions
     # ============================
@@ -1801,44 +1851,7 @@ class Dynamics(PSTH):
 
                 self.partition_pca.append(pc_dict)
 
-#       # Assign the isodynamical dimensions
-#       _, self.WrSingVals, self.isoWr = np.linalg.svd(-(np.eye(self.rnn.Wrec.shape[0]) - self.rnn.Wrec))
-#
-#       # SVD returns V^T...
-#       self.isoWr = self.isoWr.T
-#
-#       # calculate variability along the isoWr dimensions
-#       n = self.isoWr.shape[0]
-#       WrEvals = []
-#       for i in np.arange(n):
-#           WrEvals.append(self.isoWr[:,i].T.dot(self.PCs).dot(np.diag(self.evals)).dot(self.PCs.T).dot(self.isoWr[:,i]))
-#       self.WrEvals = WrEvals
-
-#       # Assign isodynamical dimensions.
-#       self.isoWr, self.iEvals, _, self.iMeans = pca(np.dot((self.rnn.Wrec - np.eye(self.rnn.Wrec.shape[0])), data_rd))
-#       self.isoWr = np.fliplr(self.isoWr)
-#       self.iEvals = np.flipud(self.iEvals)
-
-#       n = self.isoWr.shape[0]
-#       WrEvals = []
-#       for i in np.arange(n):
-#           WrEvals.append(self.isoWr[:,i].T.dot(self.PCs).dot(np.diag(self.evals)).dot(self.PCs.T).dot(self.isoWr[:,i]))
-#       self.WrEvals = WrEvals
-
-#       # Use manifold optimization to assign the iso dimensions
-#       manifold = Stiefel(100, 2)
-#       problem = Problem(manifold=manifold, cost=self.steifel_cost)
-#       solver = SteepestDescent()
-#       self.isoWr = solver.solve(problem)
-#
-#       # calculate variability along the isoWr dimensions
-#       n = self.isoWr.shape[2]
-#       WrEvals = []
-#       for i in np.arange(n):
-#           WrEvals.append(self.isoWr[:,i].T.dot(self.PCs).dot(np.diag(self.evals)).dot(self.PCs.T).dot(self.isoWr[:,i]))
-#       self.WrEvals = WrEvals
-
-        # assign the PC rate dimensions
+       # assign the PC rate dimensions
         self.rPCs, self.rEvals, _, self.rMeans = pca(data_rd)
 
         n = 100     # hack while i fix isoWr code
@@ -1942,11 +1955,11 @@ class Dynamics(PSTH):
         # grab out the partition PCs, etc.
         PCs = self.partition_pca[partition_idx]['PCs']
         means = self.partition_pca[partition_idx]['means']
-       
+
         if is_x:
             PCs = self.partition_pca[partition_idx]['x_PCs']
             means = self.partition_pca[partition_idx]['x_means']
- 
+
         # Plot each PSTH.
         for j in idxs:
 
@@ -1983,7 +1996,7 @@ class Dynamics(PSTH):
        # grab out the partition PCs, etc.
         PCs = self.partition_pca[partition_idx]['PCs']
         means = self.partition_pca[partition_idx]['means']
-       
+
         if is_x:
             PCs = self.partition_pca[partition_idx]['x_PCs']
             means = self.partition_pca[partition_idx]['x_means']
@@ -2026,7 +2039,7 @@ class Dynamics(PSTH):
        # grab out the partition PCs, etc.
         PCs = self.partition_pca[partition_idx]['PCs']
         means = self.partition_pca[partition_idx]['means']
-       
+
         if is_x:
             PCs = self.partition_pca[partition_idx]['x_PCs']
             means = self.partition_pca[partition_idx]['x_means']
@@ -2043,7 +2056,7 @@ class Dynamics(PSTH):
             start_loc = np.array((-17.5, -5))
         elif start_loc == 'Jloc2':
             start_loc = np.array((-6, -4))
- 
+
 
         # you should not mean subtract, as the pc_input is a delta
         pc_axis = np.dot(PCs.T, axis)
@@ -2055,7 +2068,7 @@ class Dynamics(PSTH):
 
         return f
 
-   
+
     def plot_pcs_area(self, f=None, savepath=None, window=None, filters=None, cond_ls=None, cond_color=None, partition_idx=0, is_x=False, alpha=1):
 
         # This plots psths, and if you specify 'filters', you can plot a subset of the psths.
@@ -2075,7 +2088,7 @@ class Dynamics(PSTH):
         # grab out the partition PCs, etc.
         PCs = self.partition_pca[partition_idx]['PCs']
         means = self.partition_pca[partition_idx]['means']
-       
+
         if is_x:
             PCs = self.partition_pca[partition_idx]['x_PCs']
             means = self.partition_pca[partition_idx]['x_means']
@@ -2133,7 +2146,7 @@ class Dynamics(PSTH):
         # grab out the partition PCs, etc.
         PCs = self.partition_pca[partition_idx]['PCs']
         means = self.partition_pca[partition_idx]['means']
-       
+
         if is_x:
             PCs = self.partition_pca[partition_idx]['x_PCs']
             means = self.partition_pca[partition_idx]['x_means']
@@ -2163,7 +2176,7 @@ class Dynamics(PSTH):
             f.savefig(savepath + 'input_PCs={}_sortables={}_align={}.pdf'.format(self.dims + 1, self.sort, self.align))
 
         return f
-       
+
 
     # ======================================
     # Plots the principal components vs time
@@ -2523,41 +2536,12 @@ class Dynamics(PSTH):
         return (x_pts, y_pts)
 
     # samples dynamics at the given x0, legacy version
-    def sample_local_dynamics_legacy(self, x0=None, x=None, y=None, inputs=np.array((0,0,0,0)), higher_dims=None, projector='PCs'):
 
-        # This code allows you to not fill in wha
-        if higher_dims is None:
-            s0 = np.array((x, y))
-        else:
-            s0 = np.hstack((x, y, higher_dims))
-
-        # Now project the point back into higher-dimensional space.
-        # (100 x 2) matrix times (2 x 1) vector
-        if x0 is None:
-            x0 = np.dot(self.x_PCs[:, np.arange(len(s0))], s0) + self.x_means
-
-        # Let's first get what r is, the projected value of r will be returned
-        r   = self.act(x0)
-
-        # Now calculate derivative at this point.
-        rdot = self.rnn_rdot(x0, inputs)
-
-        # get the projector
-        P = getattr(self, projector)
-        means = self.means if projector is 'PCs' else np.zeros_like(self.means)
-
-        # Now project this back into the lower dimensional space
-        # NOTE WE DON'T SUBTRACT THE MEANS AS THEY CANCEL OUT FOR X_{k+1} - X_k
-        s       = np.dot(P.T, r - means)
-        sdot    = np.dot(P.T, rdot)
-
-        return s, sdot
-    
     def sample_local_dynamics_area_sub(self, x0=None, inputs=np.array((0,0,0,0)), projector='PCs', partition_idx=0):
 
-        
+
         # This should be on the entire dimensional data, since the RNN should update according to its equations
-        #r   = self.act(x0) 
+        #r   = self.act(x0)
         #rdot = self.rnn_rdot(x0, inputs)
 
         r = x0
@@ -2598,9 +2582,9 @@ class Dynamics(PSTH):
 
     def sample_local_dynamics_area(self, x0=None, inputs=np.array((0,0,0,0)), projector='PCs', partition_idx=0):
 
-        
+
         # This should be on the entire dimensional data, since the RNN should update according to its equations
-        #r   = self.act(x0) 
+        #r   = self.act(x0)
         #rdot = self.rnn_rdot(x0, inputs)
 
         r = x0
@@ -2616,235 +2600,6 @@ class Dynamics(PSTH):
         sdot    = np.dot(P.T, rdot[self.partitions[partition_idx]])
 
         return s, sdot
-
-
-#    def plot_local_dynamics_delta_area_x2(self, inputs=np.array((0,0,0,0)), f=None, scale=1, force_alignment=None, t_sample=None, coh=None, reset_align=True, filters=None, partition_idx=0, xlim=None, ylim=None):
-#
-#        # coh is for sampling get_higher_dims, it is the red coherence (NOT CB).
-#        x_deltas, y_deltas  = self.delta_samples
-#
-#        # store values in the following array.
-#        ss      = np.zeros((2, len(x_deltas), len(y_deltas)))
-#        sdots   = np.zeros((2, len(x_deltas), len(y_deltas)))
-#
-#   		# manually set sampling value to be x at the PC location
-#        PCs = self.partition_pca[partition_idx]['x_PCs']
-#        means = self.partition_pca[partition_idx]['x_means']
-#
-#        if np.all(inputs == np.array((0,0,0,0))): # then we're at start_loc == baseline:
-#            x0 = self.psths[12]['x_psth'][:,0]
-#            print('start loc is baseline')
-#        elif np.all(inputs[:2] == np.array((1,-1))): # then we're at start_loc = targets1:
-#            x0 = self.psths[0]['x_psth'][:,150]
-#            print('start loc is targets1')
-#        elif np.all(inputs[:2] == np.array((-1,1))): # then we're at start_loc = targets2
-#            x0 = self.psths[12]['x_psth'][:,150]
-#            print('start loc is targets2')
-#        else: 
-#            print('NO START LOC. x0 not assigned, will error out.')
-#
-#        # Let's try to move around in this space now.
-#        for i in np.arange(len(x_deltas)):
-#            for j in np.arange(len(y_deltas)):
-#                perturb 			= np.dot(self.x_PCs[:,self.dims],  np.hstack((x_deltas[i], y_deltas[j]))) # no need to add self.x_means since this is a delta
-#
-#                # Get the high-dimensional point from which we're sampling dynamics
-#                x0_s                = x0 
-#                x0_s[self.partitions[partition_idx]] += perturb[self.partitions[partition_idx]]
-#                this_s, this_sdot   = self.sample_local_dynamics_area(x0=x0_s, inputs=inputs, partition_idx=partition_idx)
-#                sdots[:, i, j]      = this_sdot[self.dims]
-#                ss[:, i, j]         = this_s[self.dims]
-#                #pdb.set_trace()
-#		# Now plot them.
-#        if f is None:
-#            f = plt.figure()
-#        ax  = f.gca()
-#
-#
-#        if xlim is not None:
-#            ax.set_xlim(xlim)
-#        if ylim is not None:
-#            ax.set_ylim(ylim)
-#
-#        for i in np.arange(len(x_deltas)):
-#            for j in np.arange(len(y_deltas)):
-#                ax.arrow(ss[0, i, j], ss[1, i, j], scale*sdots[0,i,j], scale*sdots[1,i,j], color=np.array([0.5, 0.5, 0.5]), head_width=0.5, head_length=1)
-
-    def plot3_local_dynamics_delta_area_x(self, inputs=np.array((0,0,0,0)), f=None, scale=1, force_alignment=None, t_sample=None, coh=None, reset_align=True, filters=None, partition_idx=0, xlim=None, ylim=None):
-
-        # coh is for sampling get_higher_dims, it is the red coherence (NOT CB).
-        x_deltas, y_deltas  = self.delta_samples
-        z_deltas = x_deltas # HACK for now
-
-        # store values in the following array.
-        ss      = np.zeros((3, len(x_deltas), len(y_deltas), len(z_deltas)))
-        sdots   = np.zeros((3, len(x_deltas), len(y_deltas), len(z_deltas)))
-
-   		# manually set sampling value to be x at the PC location
-        PCs = self.partition_pca[partition_idx]['x_PCs']
-        means = self.partition_pca[partition_idx]['x_means']
-
-        if np.all(inputs == np.array((0,0,0,0))): # then we're at start_loc == baseline:
-            x0 = self.psths[12]['x_psth'][:,80]
-            print('start loc is baseline')
-        elif np.all(inputs[:2] == np.array((1,-1))): # then we're at start_loc = targets1:
-            x0 = self.psths[22]['x_psth'][:,150]
-            print('start loc is targets1')
-        elif np.all(inputs[:2] == np.array((-1,1))): # then we're at start_loc = targets2
-            x0 = self.psths[9]['x_psth'][:,200]
-            print('start loc is targets2')
-        else: 
-            print('NO START LOC. x0 not assigned, will error out.')
-
-        # Let's try to move around in this space now.
-        for i in np.arange(len(x_deltas)):
-            for j in np.arange(len(y_deltas)):
-                for k in np.arange(len(y_deltas)):
-
-                    # Get the high-dimensional point from which we're sampling dynamics
-                    x0_s                = x0 + np.dot(self.x_PCs[:,self.dims],  np.hstack((x_deltas[i], y_deltas[j], z_deltas[j]))) # no need to add self.x_means since this is a delta
-                    this_s, this_sdot   = self.sample_local_dynamics_area(x0=x0_s, inputs=inputs, partition_idx=partition_idx)
-                    sdots[:, i, j, k]      = this_sdot[self.dims]
-                    ss[:, i, j, k]         = this_s[self.dims]
-                #pdb.set_trace()
-		# Now plot them.
-        if f is None:
-            f = plt.figure()
-        ax  = f.gca()
-
-
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        if ylim is not None:
-            ax.set_ylim(ylim)
-
-        for i in np.arange(len(x_deltas)):
-            for j in np.arange(len(y_deltas)):
-                for k in np.arange(len(z_deltas)):
-            
-                    ax.quiver(ss[0, i, j, k], ss[1, i, j, k], ss[2, i, j, k], scale*sdots[0,i,j, k], scale*sdots[1,i,j,k], scale*sdots[2,i,j,k], color=np.array([0.5, 0.5, 0.5]))
-                    ax.quiver(ss[0, i, j, k], ss[1, i, j, k], ss[2, i, j, k], scale*sdots[0,i,j,k], scale*sdots[1,i,j,k], scale*sdots[2,i,j,k], color=np.array([0.5, 0.5, 0.5]))
-
-        ax.set_zlim([-25, 10])
-        ax.set_ylim([-15, 15])
-        ax.set_zlim([-4, 4])
-
-
-        return f
-
-#    def plot_local_dynamics_delta_area_x_temporal(self, inputs=np.array((0,0,0,0)), times=[150], conds=[9], f=None, scale=1, force_alignment=None, t_sample=None, coh=None, reset_align=True, filters=None, partition_idx=0, xlim=None, ylim=None):
-#
-#        # coh is for sampling get_higher_dims, it is the red coherence (NOT CB).
-#        x_deltas, y_deltas  = self.delta_samples
-#
-#        # store values in the following array.
-#        ss      = np.zeros((2, len(x_deltas), len(y_deltas)))
-#        sdots   = np.zeros((2, len(x_deltas), len(y_deltas)))
-#
-#   		# manually set sampling value to be x at the PC location
-#        PCs = self.partition_pca[partition_idx]['x_PCs']
-#        means = self.partition_pca[partition_idx]['x_means']
-#        print('booyah!\n\n\nbooyah!')
-#		# Now plot them.
-#        if f is None:
-#            f = plt.figure()
-#        ax  = f.gca()
-#
-#
-#        for t in times:
-#            for x in conds:
-#
-#                if np.all(inputs == np.array((0,0,0,0))): # then we're at start_loc == baseline:
-#                    x0 = self.psths[x]['x_psth'][:,t]
-#                    #print('start loc is baseline')
-#                elif np.all(inputs[:2] == np.array((1,-1))): # then we're at start_loc = targets1:
-#                    x0 = self.psths[x]['x_psth'][:,t]
-#                    #print('start loc is targets1')
-#                elif np.all(inputs[:2] == np.array((-1,1))): # then we're at start_loc = targets2
-#                    x0 = self.psths[x]['x_psth'][:,t]
-#                    #print('start loc is targets2')
-#                else: 
-#                    print('NO START LOC. x0 not assigned, will error out.')
-#    
-#                # Let's try to move around in this space now.
-#                for i in np.arange(len(x_deltas)):
-#                    for j in np.arange(len(y_deltas)):
-#    
-#                        # Get the high-dimensional point from which we're sampling dynamics
-#                        x0_s                = x0 + np.dot(self.x_PCs[:,self.dims],  np.hstack((x_deltas[i], y_deltas[j]))) # no need to add self.x_means since this is a delta
-#                        this_s, this_sdot   = self.sample_local_dynamics_area(x0=x0_s, inputs=inputs, partition_idx=partition_idx)
-#                        sdots[:, i, j]      = this_sdot[self.dims]
-#                        ss[:, i, j]         = this_s[self.dims]
-#                        #pdb.set_trace()
-#    
-#                if xlim is not None:
-#                    ax.set_xlim(xlim)
-#                if ylim is not None:
-#                    ax.set_ylim(ylim)
-#    
-#                for i in np.arange(len(x_deltas)):
-#                    for j in np.arange(len(y_deltas)):
-#                        arrow_color = np.array([0,0,0])
-#                        ax.arrow(ss[0, i, j], ss[1, i, j], scale*sdots[0,i,j], scale*sdots[1,i,j], color=arrow_color, head_width=0.5*scale, head_length=1*scale)
-#
-#        return f
-#
-
-
-    def plot_local_dynamics_delta_area_x(self, inputs=np.array((0,0,0,0)), f=None, scale=1, force_alignment=None, t_sample=None, coh=None, reset_align=True, filters=None, partition_idx=0, xlim=None, ylim=None):
-
-        # coh is for sampling get_higher_dims, it is the red coherence (NOT CB).
-        x_deltas, y_deltas  = self.delta_samples
-
-        # store values in the following array.
-        ss      = np.zeros((2, len(x_deltas), len(y_deltas)))
-        sdots   = np.zeros((2, len(x_deltas), len(y_deltas)))
-
-   		# manually set sampling value to be x at the PC location
-        PCs = self.partition_pca[partition_idx]['x_PCs']
-        means = self.partition_pca[partition_idx]['x_means']
-
-        if np.all(inputs == np.array((0,0,0,0))): # then we're at start_loc == baseline:
-            x0 = self.psths[0]['x_psth'][:,80]
-            print('start loc is baseline')
-        elif np.all(inputs[:2] == np.array((1,-1))): # then we're at start_loc = targets1:
-            x0 = self.psths[0]['x_psth'][:,150]
-            print('start loc is targets1')
-        elif np.all(inputs[:2] == np.array((-1,1))): # then we're at start_loc = targets2
-            x0 = self.psths[9]['x_psth'][:,200]
-            print('start loc is targets2')
-        else: 
-            print('NO START LOC. x0 not assigned, will error out.')
-
-        # Let's try to move around in this space now.
-        for i in np.arange(len(x_deltas)):
-            for j in np.arange(len(y_deltas)):
-
-                # Get the high-dimensional point from which we're sampling dynamics
-                x0_s                = x0 + np.dot(self.x_PCs[:,self.dims],  np.hstack((x_deltas[i], y_deltas[j]))) # no need to add self.x_means since this is a delta
-                this_s, this_sdot   = self.sample_local_dynamics_area(x0=x0_s, inputs=inputs, partition_idx=partition_idx)
-                sdots[:, i, j]      = this_sdot[self.dims]
-                ss[:, i, j]         = this_s[self.dims]
-
-                #pdb.set_trace()
-		# Now plot them.
-        if f is None:
-            f = plt.figure()
-        ax  = f.gca()
-
-
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        if ylim is not None:
-            ax.set_ylim(ylim)
-
-        for i in np.arange(len(x_deltas)):
-            for j in np.arange(len(y_deltas)):
-                #ax.arrow(ss[0, i, j], ss[1, i, j], scale*sdots[0,i,j], scale*sdots[1,i,j], color=np.array([0.5, 0.5, 0.5]), head_width=0.5, head_length=1)
-                ax.plot([ss[0, i, j], ss[0,i,j] + scale*sdots[0,i,j]], [ss[1,i,j], ss[1,i,j] + scale*sdots[1,i,j]], color='k', linewidth=2)
-                #ax.plot(ss[0,i,j] + scale*sdots[0,i,j], ss[1,i,j] + scale*sdots[1,i,j], linewidth=0, marker='o', markersize=10)
-
-        return f
 
     def plot_local_dynamics_delta_area_x_temporal(self, inputs=np.array((0,0,0,0)), times=[150], conds=[9], f=None, scale=1, force_alignment=None, t_sample=None, coh=None, reset_align=True, filters=None, partition_idx=0, xlim=None, ylim=None):
 
@@ -2877,7 +2632,7 @@ class Dynamics(PSTH):
                 elif np.all(inputs[:2] == np.array((-1,1))): # then we're at start_loc = targets2
                     x0 = self.psths[x]['x_psth'][:,t]
                     #print('start loc is targets2')
-                else: 
+                else:
                     print('NO START LOC. x0 not assigned, will error out.')
 
                 #if t == 150:
@@ -2885,19 +2640,19 @@ class Dynamics(PSTH):
                 # Let's try to move around in this space now.
                 for i in np.arange(len(x_deltas)):
                     for j in np.arange(len(y_deltas)):
-    
+
                         # Get the high-dimensional point from which we're sampling dynamics
                         x0_s                = x0 + np.dot(self.x_PCs[:,self.dims],  np.hstack((x_deltas[i], y_deltas[j]))) # no need to add self.x_means since this is a delta
                         this_s, this_sdot   = self.sample_local_dynamics_area(x0=x0_s, inputs=inputs, partition_idx=partition_idx)
                         sdots[:, i, j]      = this_sdot[self.dims]
                         ss[:, i, j]         = this_s[self.dims]
                         #pdb.set_trace()
-    
+
                 if xlim is not None:
                     ax.set_xlim(xlim)
                 if ylim is not None:
                     ax.set_ylim(ylim)
-    
+
                 for i in np.arange(len(x_deltas)):
                     for j in np.arange(len(y_deltas)):
                         arrow_color = np.array([0,0,0])
@@ -2907,7 +2662,8 @@ class Dynamics(PSTH):
 
         return f
 
-    def plot_local_dynamics_delta_area_x_sub_dyn(self, inputs=np.array((0,0,0,0)), f=None, scale=1, force_alignment=None, t_sample=None, coh=None, reset_align=True, filters=None, partition_idx=0):
+
+    def plot_local_dynamics_delta_area_x(self, inputs=np.array((0,0,0,0)), f=None, scale=1, force_alignment=None, t_sample=None, coh=None, reset_align=True, filters=None, partition_idx=0, xlim=None, ylim=None):
 
         # coh is for sampling get_higher_dims, it is the red coherence (NOT CB).
         x_deltas, y_deltas  = self.delta_samples
@@ -2916,62 +2672,23 @@ class Dynamics(PSTH):
         ss      = np.zeros((2, len(x_deltas), len(y_deltas)))
         sdots   = np.zeros((2, len(x_deltas), len(y_deltas)))
 
-		# manually set sampling value to be x at the PC location
+   		# manually set sampling value to be x at the PC location
         PCs = self.partition_pca[partition_idx]['x_PCs']
         means = self.partition_pca[partition_idx]['x_means']
 
         if np.all(inputs == np.array((0,0,0,0))): # then we're at start_loc == baseline:
-            x0 = self.psths[0]['x_psth'][self.partitions[partition_idx],0]
-        elif np.all(inputs == np.array((1,-1,0,0))): # then we're at start_loc = targets1:
-            x0 = self.psths[0]['x_psth'][self.partitions[partition_idx],180]
-        elif np.all(inputs == np.array((-1,1,0,0))): # then we're at start_loc = targets2
-            x0 = self.psths[-1]['x_psth'][self.partitions[partition_idx],150]
-        else: 
+            x0 = self.psths[0]['x_psth'][:,80]
+            print('start loc is baseline')
+        elif np.all(inputs[:2] == np.array((1,-1))): # then we're at start_loc = targets1:
+            x0 = self.psths[25]['x_psth'][:,150]
+            print('start loc is targets1')
+        elif np.all(inputs[:2] == np.array((-1,1))): # then we're at start_loc = targets2
+            x0 = self.psths[9]['x_psth'][:,200]
+            print('start loc is targets2')
+        else:
             print('NO START LOC. x0 not assigned, will error out.')
 
         # Let's try to move around in this space now.
-        for i in np.arange(len(x_deltas)):
-            for j in np.arange(len(y_deltas)):
-
-                # Get the high-dimensional point from which we're sampling dynamics
-                x0_s                = x0 + np.dot(self.partition_pca[partition_idx]['x_PCs'][:,self.dims],  np.hstack((x_deltas[i], y_deltas[j]))) # no need to add self.x_means since this is a delta
-                this_s, this_sdot   = self.sample_local_dynamics_area_sub(x0=x0_s, inputs=inputs, partition_idx=partition_idx)
-                sdots[:, i, j]      = this_sdot[self.dims]
-                ss[:, i, j]         = this_s[self.dims]
-                #pdb.set_trace()
-		# Now plot them.
-        if f is None:
-            f = plt.figure()
-        ax  = f.gca()
-
-
-        for i in np.arange(len(x_deltas)):
-            for j in np.arange(len(y_deltas)):
-                ax.arrow(ss[0, i, j], ss[1, i, j], scale*sdots[0,i,j], scale*sdots[1,i,j], color=np.array([0.5, 0.5, 0.5]), head_width=0.5, head_length=1)
-
-
-    # Plots the local dynamics from deltas
-    def plot_local_dynamics_delta_area_old(self, inputs=np.array((0,0,0,0)), f=None, scale=1, force_alignment=None, t_sample=None, coh=None, reset_align=True, filters=None, partition_idx=0):
-
-        # coh is for sampling get_higher_dims, it is the red coherence (NOT CB).
-        x_deltas, y_deltas  = self.delta_samples
-
-        # store values in the following array.
-        ss      = np.zeros((2, len(x_deltas), len(y_deltas)))
-        sdots   = np.zeros((2, len(x_deltas), len(y_deltas)))
-
-        # Create the input to the RNN from which we sample dynamics
-        higher_dim_inputs   = inputs.astype('float64')  # needed since coh is fractional
-
-        # Allow the user to specify the coherences if desired for the input.
-        if coh is not None:
-            higher_dim_inputs[2]    = +coh
-            higher_dim_inputs[3]    = -coh
-
-        # Call to sample initial point
-        x0      = self.get_higher_dims(inputs=higher_dim_inputs, return_psth=True, field='x', force_alignment=force_alignment, t_sample=t_sample, reset_align=reset_align, filters=filters)
-
-        # Get all the derivatives at the sample points.
         for i in np.arange(len(x_deltas)):
             for j in np.arange(len(y_deltas)):
 
@@ -2980,33 +2697,25 @@ class Dynamics(PSTH):
                 this_s, this_sdot   = self.sample_local_dynamics_area(x0=x0_s, inputs=inputs, partition_idx=partition_idx)
                 sdots[:, i, j]      = this_sdot[self.dims]
                 ss[:, i, j]         = this_s[self.dims]
-                #pdb.set_trace()
 
-        # Now plot them.
+                #pdb.set_trace()
+		# Now plot them.
         if f is None:
             f = plt.figure()
         ax  = f.gca()
 
-        round_f = 1
-        rx_min  = np.min(ss[0]) // round_f * round_f
-        rx_max  = np.max(ss[0] + round_f) // round_f * round_f
-        ry_min  = np.min(ss[1]) // round_f * round_f
-        ry_max  = np.max(ss[1] + round_f) // round_f * round_f
 
-        #ax.set_xlim([rx_min, rx_max])
-        #ax.set_ylim([ry_min, ry_max])
-
-        sdots   = self.rnn.p['dt'] * sdots * scale # since dt = 10ms; this is actually how far the trajectory will go
+        if xlim is not None:
+            ax.set_xlim(xlim)
+        if ylim is not None:
+            ax.set_ylim(ylim)
 
         for i in np.arange(len(x_deltas)):
             for j in np.arange(len(y_deltas)):
-                ax.arrow(ss[0, i, j], ss[1, i, j], sdots[0, i, j], sdots[1, i, j], color=np.array([0.5, 0.5, 0.5]), head_width=0.5, head_length=1)
+                #ax.arrow(ss[0, i, j], ss[1, i, j], scale*sdots[0,i,j], scale*sdots[1,i,j], color=np.array([0.5, 0.5, 0.5]), head_width=0.5, head_length=1)
+                ax.plot([ss[0, i, j], ss[0,i,j] + scale*sdots[0,i,j]], [ss[1,i,j], ss[1,i,j] + scale*sdots[1,i,j]], color='k', linewidth=2)
+                #ax.plot(ss[0,i,j] + scale*sdots[0,i,j], ss[1,i,j] + scale*sdots[1,i,j], linewidth=0, marker='o', markersize=10)
 
-        # FOR DEBUGGING
-
-        #x0         = self.get_higher_dims(inputs=higher_dim_inputs, return_psth=True, field='r', force_alignment=force_alignment, t_sample=t_sample, reset_align=reset_align)
-        #px0 = np.dot(self.PCs[:, self.dims].T, x0 - self.means)
-        #ax.plot(px0[0], px0[1], marker='x', markersize=20)
         return f
 
     # Gets the higher dimensions to plot; or returns the value of the PSTH at the desired time point
