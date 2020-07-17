@@ -47,7 +47,7 @@ python sims/get_dpca_vals.sh
 
 The null/potent values are generated using `python sims/null_potent_dpca.py`.
 
-A network is trained by running
+A network is trained by running:
 ```
 python examples/do.py examples/models/2020-04-10_cb_simple_3areas.py train
 ```
