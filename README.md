@@ -5,7 +5,8 @@ This Python package trains and analyzes multi-area RNNs. It trains RNNs by expan
 - [Installation Guide](#installation-guide)
 - [Examples](#examples)
 
-# Installation Guide (~5 minutes):
+# Installation Guide:
+This should take only a couple minutes on a local computer.
 
 1. Create a virtual environment. We recommend using virtualenvrapper (https://virtualenvwrapper.readthedocs.io/en/latest/)
 
