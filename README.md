@@ -13,8 +13,8 @@ We train and analyze multi-area RNNs.
 # Installation Guide:
 
 1. Create a virtual environment. We recommend using virtualenvrapper (https://virtualenvwrapper.readthedocs.io/en/latest/)
-```
 
+```
 $ pip install virtualenvwrapper
 $ mkvirtualenv -p python2.7 your-virtual-env-name
 ```
