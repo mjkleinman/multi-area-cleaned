@@ -46,7 +46,7 @@ These `sims/Revision_main.ipynb` uses saved values for the hyperparameter sweeps
 ./sims/get_dpca_vals.sh
 ```
 
-The null/potent values are generated using `python sims/null_potent_dpca.py`. To run these scripts, update the paths in `cfg_mk`.
+The null/potent values are generated using `python sims/null_potent_dpca.py`. To run these scripts, update the paths (`path` and `rnn_datapath`) in `cfg_mk.py`.
 
 A network is trained by running:
 ```
