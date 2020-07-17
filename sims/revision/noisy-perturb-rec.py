@@ -13,7 +13,7 @@ import os
 import cPickle as pkl
 import matplotlib.pyplot as plt
 import pdb
-from pycog.trial_chandr import PSTH
+from pycog.trialRNN import PSTH
 from cfg_mk import cfg_mk
 import argparse
 

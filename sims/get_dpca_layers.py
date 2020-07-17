@@ -1,6 +1,6 @@
 import numpy as np
 from dPCA import dPCA
-from pycog.trial_chandr import PSTH
+from pycog.trialRNN import PSTH
 import os
 
 idx1 = np.hstack((np.arange(80), np.arange(240, 260)))

@@ -8,7 +8,7 @@ import sys
 import subprocess
 import numpy as np
 import pdb
-from pycog.trial_chandr import PSTH
+from pycog.trialRNN import PSTH
 from cfg_mk import cfg_mk
 # function to call unix lines
 

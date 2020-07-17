@@ -3357,7 +3357,7 @@ class Dynamics(PSTH):
 
                 # plot the inputs
                 inp_scores = np.dot(P.T, self.rnn.Win.dot(self.psths[j]['u_psth'][:, :])[partition, :])
-                ax.plot(inp_scores[0,window], inp_scores[1,window], inp_scores[2, window], color='black', linestyle=c_ls, alpha=alphaval, linewidth=c_lw)
+                # ax.plot(inp_scores[0,window], inp_scores[1,window], inp_scores[2, window], color='black', linestyle=c_ls, alpha=alphaval, linewidth=c_lw)
 
             # TODO clean up code:
             tdr_axes = P.T.dot(betas)

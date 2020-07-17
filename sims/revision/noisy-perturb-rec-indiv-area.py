@@ -9,7 +9,7 @@ import sys
 import subprocess
 import numpy as np
 import pdb
-from pycog.trial_chandr import PSTH
+from pycog.trialRNN import PSTH
 from cfg_mk import cfg_mk
 import argparse
 
@@ -91,7 +91,6 @@ for (a, this_file) in enumerate(all_files):
 print('low:' + str(np.mean(choose_low_store)))
 print('med:' + str(np.mean(choose_med_store)))
 print('high:' + str(np.mean(choose_high_store)))
-
 
 
 data_save_path = cfg_mk['path'] + "sims/revision/scratch_data"
