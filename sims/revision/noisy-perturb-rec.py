@@ -42,7 +42,7 @@ datapath = cfg_mk['rnn_datapath']
 os.chdir(datapath + cfg_mk['modelpath'])
 
 # # modelpath
-modelpath = '/Users/michael/Documents/tibi/examples/models/cb_analyze_fixed-cb.py'
+modelpath = cfg_mk['path'] + 'examples/models/cb_analyze_fixed-cb.py'
 
 if cfg_mk['num_seeds'] > -1:
     all_files = [cfg_mk['modelpath'] + cfg_mk['suffix'] + '_seed=' + str(seed) + '.pkl' for seed in range(cfg_mk['num_seeds'])]
@@ -88,7 +88,7 @@ print('low:' + str(np.mean(choose_low_store)))
 print('med:' + str(np.mean(choose_med_store)))
 print('high:' + str(np.mean(choose_high_store)))
 
-data_save_path = "/Users/michael/Documents/GitHub/multi-area/sims/revision/scratch_data"
+data_save_path = cfg_mk['path'] + "sims/revision/scratch_data"
 os.chdir(data_save_path)
 np.save(cfg_mk['modelpath'] + cfg_mk['suffix'] + '_uconds' + '.npy', u_conds)
 np.save(cfg_mk['modelpath'] + cfg_mk['suffix'] + '_0p05noise' + '.npy', choose_low_store)

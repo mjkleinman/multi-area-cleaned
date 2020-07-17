@@ -56,7 +56,7 @@ else:
     os.chdir(datapath + cfg_mk['modelpath'])
 
 # # modelpath
-modelpath = '/Users/michael/Documents/GitHub/multi-area-cleaned/examples/models/cb_analyze_fixed-cb.py'
+modelpath = cfg_mk['path'] + 'examples/models/cb_analyze_fixed-cb.py'
 
 
 plt.close('all')
@@ -120,7 +120,7 @@ for mm in range(len(all_files)):
     dvar_store[mm] = dvar
     xvar_store[mm] = xvar
 
-data_save_path = "/Users/michael/Documents/GitHub/multi-area/sims/revision/scratch_data_dpca"
+data_save_path = cfg_mk['path'] + "sims/revision/scratch_data_dpca"
 os.chdir(data_save_path)
 print(cvar_store)
 np.save(cfg_mk['modelpath'] + cfg_mk['suffix'] + '_dpca_color' + '.npy', cvar_store)

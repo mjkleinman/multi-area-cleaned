@@ -9,10 +9,10 @@ idx3 = np.hstack((np.arange(160, 240), np.arange(280, 300)))
 
 # rnnpath
 # rnnbase = '/Users/michael/Desktop/tibi_backup/tibi/saved_rnns/three_rnns/'
-rnnbase = '/Users/michael/Documents/GitHub/multi-area-cleaned/saved_rnns_server_apr/data/2020-04-10_cb_simple_3areas/'
+rnnbase = cfg_mk['path'] + 'saved_rnns_server_apr/data/2020-04-10_cb_simple_3areas/'
 
 # modelpath
-modelpath = '/Users/michael/Documents/GitHub/multi-area-cleaned/examples/models/cb_analyze_fixed-cb.py'
+modelpath = cfg_mk['path'] + 'examples/models/cb_analyze_fixed-cb.py'
 
 cvar = np.zeros((8, 3))
 dvar = np.zeros((8, 3))
@@ -52,7 +52,7 @@ for file_id in range(8):
 # save data
 # if rnnbase == '/Users/michael/Documents/GitHub/multi-area/saved_rnns_server_apr/data/2020-04-10_cb_simple_3areas/':
 #     data_save_path =
-data_save_path = "/Users/michael/Documents/GitHub/multi-area/sims/revision/scratch_data_dpca"
+data_save_path = cfg_mk['path'] + "sims/revision/scratch_data_dpca"
 os.chdir(data_save_path)
 np.save('dpca_layers_color.npy', cvar)
 np.save('dpca_layers_direction.npy', dvar)

@@ -34,7 +34,7 @@ os.chdir(datapath + cfg_mk['modelpath'])
 # os.chdir(datapath)
 
 # # modelpath
-modelpath = '/Users/michael/Documents/tibi/examples/models/cb_analyze_fixed-cb.py'
+modelpath = cfg_mk['path'] + 'examples/models/cb_analyze_fixed-cb.py'
 
 
 plt.close('all')
@@ -120,6 +120,6 @@ for mm in range(len(all_files)):
         dims_store[mm, 3] = getDim(rates[:, idx4])
 
 
-data_save_path = "/Users/michael/Documents/GitHub/multi-area/sims/revision/scratch_data"
+data_save_path = cfg_mk['path'] + "sims/revision/scratch_data"
 os.chdir(data_save_path)
 np.save(cfg_mk['modelpath'] + cfg_mk['suffix'] + '_dims' + '.npy', dims_store)

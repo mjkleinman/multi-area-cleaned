@@ -51,7 +51,7 @@ else:
     os.chdir(datapath + cfg_mk['modelpath'])
 
 # # modelpath
-modelpath = '/Users/michael/Documents/GitHub/multi-area-cleaned/examples/models/cb_analyze_fixed-cb.py'
+modelpath = cfg_mk['path'] + 'examples/models/cb_analyze_fixed-cb.py'
 
 
 plt.close('all')
@@ -174,7 +174,7 @@ print ('context:' + str(1 - (mi_store_context * 1.44)))
 print ('color:' + str(1 - (mi_store_color * 1.44)))
 print ('direction:' + str(1 - (mi_store * 1.44)))
 
-data_save_path = "/Users/michael/Documents/GitHub/multi-area/sims/revision/exemplar_new/scratch_data_mi"
+data_save_path = cfg_mk['path'] + "sims/revision/exemplar_new/scratch_data_mi"
 os.chdir(data_save_path)
 # add in linear
 suffix_linear = ''

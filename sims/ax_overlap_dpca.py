@@ -23,7 +23,7 @@ regex = re.compile('2018-08-29_cb_3areas_ff0p\d_fb0p\d*_seed=\d.pkl')
 # regex = re.compile('2018-08-29_cb_3areas_ff0p1_fb0p05_seed=\d.pkl')
 all_files = [string for string in onlyfiles if re.match(regex, string)]
 
-modelpath = '/Users/michael/Documents/tibi/examples/models/cb_analyze_fixed-cb.py'
+modelpath = cfg_mk['path'] + 'examples/models/cb_analyze_fixed-cb.py'
 num_files = len(all_files)
 num_axes = 2
 overlap12_store = np.zeros((5, 8, num_axes, 1))
@@ -91,7 +91,7 @@ for p, param in enumerate(params):
 
 overlap12_store = overlap12_store.reshape(5, 8, num_axes)
 
-savepath = '/Users/michael/Documents/GitHub/multi-area/sims/revision/exemplar_new/scratch_data_dpca/'
+savepath = cfg_mk['path'] + 'sims/revision/exemplar_new/scratch_data_dpca/'
 np.save(savepath + 'ax_overlap_dpca.npy', overlap12_store)
 # np.save(savepath + 'null_potent_dpca_l2.npy', overlap23_store)
 # np.save(savepath + 'null_potent_dpca_fb_l2.npy', overlap21_store)
