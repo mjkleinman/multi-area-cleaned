@@ -16,7 +16,7 @@ $ mkvirtualenv -p python2.7 your-virtual-env-name
 2. Add `multi-area-cleaned` to path
 
 ```
-$ add2path \path\to\multi-area-cleaned
+$ add2path /path/to/multi-area-cleaned
 ```
 
 3. Install the dependencies
