@@ -54,11 +54,10 @@ The null/potent values are generated using `python sims/null_potent_dpca.py`.
 
 A network is trained by running
 ```
-python do.py models/2020-04-10_cb_simple_3areas.py train
+python examples/do.py examples/models/2020-04-10_cb_simple_3areas.py train
 ```
 
 Multiple networks are trained by running: `python sims/three_rnn_train.py` with the parameter configuration defined in the dictionary `cfg_mk.py`
-
 
 Please send any questions about the code to michael.kleinman@ucla.edu
 
