@@ -9,10 +9,10 @@ idx3 = np.hstack((np.arange(160, 240), np.arange(280, 300)))
 
 # rnnpath
 # rnnbase = '/Users/michael/Desktop/tibi_backup/tibi/saved_rnns/three_rnns/'
-rnnbase = '/Users/michael/Documents/GitHub/multi-area/saved_rnns_server_apr/data/2020-04-10_cb_simple_3areas/'
+rnnbase = '/Users/michael/Documents/GitHub/multi-area-cleaned/saved_rnns_server_apr/data/2020-04-10_cb_simple_3areas/'
 
 # modelpath
-modelpath = '/Users/michael/Documents/GitHub/multi-area/examples/models/cb_analyze_fixed-cb.py'
+modelpath = '/Users/michael/Documents/GitHub/multi-area-cleaned/examples/models/cb_analyze_fixed-cb.py'
 
 cvar = np.zeros((8, 3))
 dvar = np.zeros((8, 3))

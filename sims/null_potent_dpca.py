@@ -17,12 +17,7 @@ import re
 # os.chdir("/Users/michael/Desktop/tibi_backup/tibi/saved_rnns/three_rnns")
 os.chdir(cfg_mk['rnn_datapath'])
 
-# get all files in this directory
-onlyfiles = [f for f in listdir('.') if isfile(join('.', f))]
-regex = re.compile('2018-08-29_cb_3areas_ff0p\d_fb0p\d*_seed=\d.pkl')
-all_files = [string for string in onlyfiles if re.match(regex, string)]
-
-modelpath = '/Users/michael/Documents/tibi/examples/models/cb_analyze_fixed-cb.py'
+modelpath = '/Users/michael/Documents/GitHub/multi-area-cleaned/examples/models/cb_analyze_fixed-cb.py'
 overlap12_store = np.zeros((5, 8, 3, 80))
 overlap21_store = np.zeros((5, 8, 3, 80))
 overlap23_store = np.zeros((5, 8, 3, 80))
@@ -132,7 +127,7 @@ for p, param in enumerate(params):
         overlap32_store[p, seed, :, :] = getOverlap(dpca_axes3, W32)
 
 
-savepath = '/Users/michael/Documents/GitHub/multi-area/sims/revision/exemplar_new/scratch_data_dpca/'
+savepath = '/Users/michael/Documents/GitHub/multi-area-cleaned/sims/revision/exemplar_new/scratch_data_dpca/'
 np.save(savepath + 'null_potent_dpca.npy', overlap12_store)
 np.save(savepath + 'null_potent_dpca_l2.npy', overlap23_store)
 np.save(savepath + 'null_potent_dpca_fb_l2.npy', overlap21_store)
