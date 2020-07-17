@@ -1,4 +1,4 @@
-# script to train many single RNNs
+# script to train many RNNs
 import pdb
 import sys
 import subprocess
@@ -29,8 +29,7 @@ modelpath = cfg_mk['modelpath']
 suffix = cfg_mk['suffix']
 
 # Run
-# seeds = np.arange(num_runs)
-seeds = np.arange(6, 8)
+seeds = np.arange(num_runs)
 ffs = ['0p1']
 fbs = ['0p05']
 # lambdars = ['1e-1', '1']

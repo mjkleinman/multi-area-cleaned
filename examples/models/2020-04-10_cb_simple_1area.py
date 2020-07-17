@@ -49,7 +49,7 @@ var_rec = 0.05**2
 lambda2_in = 1  # 0#1e-3
 lambda2_rec = 1  # 1e-3
 lambda2_out = 1  # 1e-3
-lambda2_r = 1  # 1.9e-3
+lambda2_r = 0  # 1.9e-3
 lambda_Omega = 2
 
 # hidden activation

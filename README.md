@@ -11,22 +11,27 @@ We train and analyze multi-area RNNs.
 
 
 # Installation Guide:
-In a virtual environment, using Python 2.7.17, install the dependencies
 
-1. Create a virtual environment
+1. Create a virtual environment. We recommend using virtualenvrapper (https://virtualenvwrapper.readthedocs.io/en/latest/)
 ```
-$ virtualenv --system-site-packages -p python2.7 your-virtual-env-name
-$ source your-virtual-env-name/bin/activate
+
+$ pip install virtualenvwrapper
+$ mkvirtualenv -p python2.7 your-virtual-env-name
+```
+2. Add `multi-area-cleaned` to path
+
+```
+$ add2path \path\to\multi-area-cleaned
+```
+
+3. Install the dependencies
+```
+pip install -r requirements.txt
 ```
 
 When you are finished working in the virtual environment, run:
 ```
 $ deactivate
-```
-
-2. Install the dependencies
-```
-pip install -r requirements.txt
 ```
 
 # Examples
