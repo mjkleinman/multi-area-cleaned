@@ -33,16 +33,16 @@ $ deactivate
 To generate the figures for the paper, run the Jupyter notebook:
 
 ```
-sims/Revision (Finalized).ipynb
-sims/Revision [exemplar].ipynb
-dynamics.ipynb
+sims/Revision_main.ipynb
+sims/Revision_exemplar.ipynb
+sims/dynamics_polished.ipynb
 ```
 
-These `sims/Revision (Finalized).ipynb` used saved values for the hyperparameter sweeps. The mutual information and dpca variance values are generated using:
+These `sims/Revision_main.ipynb` uses saved values for the hyperparameter sweeps. The mutual information and dpca variance values are generated using:
 
 ```
-python sims/get_mutualinfo_vals.sh
-python sims/get_dpca_vals.sh
+./sims/get_mutualinfo_vals.sh
+./sims/get_dpca_vals.sh
 ```
 
 The null/potent values are generated using `python sims/null_potent_dpca.py`.

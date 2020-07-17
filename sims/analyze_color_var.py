@@ -56,7 +56,7 @@ else:
     os.chdir(datapath + cfg_mk['modelpath'])
 
 # # modelpath
-modelpath = '/Users/michael/Documents/tibi/examples/models/cb_analyze_fixed-cb.py'
+modelpath = '/Users/michael/Documents/GitHub/multi-area-cleaned/examples/models/cb_analyze_fixed-cb.py'
 
 
 plt.close('all')
