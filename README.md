@@ -57,6 +57,8 @@ A network is trained by running
 python examples/do.py examples/models/2020-04-10_cb_simple_3areas.py train
 ```
 
+The different RNN modelfiles are in `examples/models/`
+
 Multiple networks are trained by running: `python sims/three_rnn_train.py` with the parameter configuration defined in the dictionary `cfg_mk.py`
 
 Please send any questions about the code to michael.kleinman@ucla.edu
