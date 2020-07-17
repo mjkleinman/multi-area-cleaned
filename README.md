@@ -17,6 +17,7 @@ $ mkvirtualenv -p python2.7 your-virtual-env-name
 
 ```
 $ add2path /path/to/multi-area-cleaned
+$ add2path /path/to/multi-area-cleaned/pycog
 ```
 
 3. Install the dependencies
@@ -45,7 +46,7 @@ These `sims/Revision_main.ipynb` uses saved values for the hyperparameter sweeps
 ./sims/get_dpca_vals.sh
 ```
 
-The null/potent values are generated using `python sims/null_potent_dpca.py`.
+The null/potent values are generated using `python sims/null_potent_dpca.py`. To run these scripts, update the paths in `cfg_mk`.
 
 A network is trained by running:
 ```
@@ -54,7 +55,7 @@ python examples/do.py examples/models/2020-04-10_cb_simple_3areas.py train
 
 The different RNN modelfiles are in `examples/models/` and the trained models are in `saved_rnns_server_apr/data/`
 
-Multiple networks are trained by running: `python sims/three_rnn_train.py` with the parameter configuration defined in the dictionary `cfg_mk.py`
+Multiple networks are trained by running: `python sims/three_rnn_train.py` with the parameter configuration defined in the dictionary `cfg_mk.py`.
 
 Please send any questions about the code to michael.kleinman@ucla.edu
 
