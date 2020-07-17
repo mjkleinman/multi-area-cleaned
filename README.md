@@ -45,7 +45,7 @@ python sims/get_mutualinfo_vals.sh
 python sims/get_dpca_vals.sh
 ```
 
-The null/potent values are generated using `python null_potent_dpca.py`.
+The null/potent values are generated using `python sims/null_potent_dpca.py`.
 
 A network is trained by running
 ```
