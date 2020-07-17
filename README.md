@@ -29,7 +29,7 @@ $ deactivate
 pip install -r requirements.txt
 ```
 
-# examples
+# Examples
 To generate the figures, run the Jupyter notebook:
 
 ```
@@ -38,12 +38,14 @@ sims/Revision [exemplar].ipynb
 dynamics.ipynb
 ```
 
-These `sims/Revision (Finalized).ipynb` used saved values for the hyperparameter sweeps. The mutual information and dpca variance values are generated using
+These `sims/Revision (Finalized).ipynb` used saved values for the hyperparameter sweeps. The mutual information and dpca variance values are generated using:
 
 ```
 python sims/get_mutualinfo_vals.sh
 python sims/get_dpca_vals.sh
 ```
+
+The null/potent values are generated using `python null_potent_dpca.py`.
 
 A network is trained by running
 ```
@@ -54,5 +56,7 @@ Multiple networks are trained by running:
 ```
 python sims/three_rnn_train.py
 ```
+
+Please send any questions about the code to michael.kleinman@ucla.edu
 
 
