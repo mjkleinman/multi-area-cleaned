@@ -15,6 +15,7 @@ $ pip install virtualenvwrapper
 $ source /usr/local/bin/virtualenvwrapper.sh
 $ mkvirtualenv -p python2.7 your-virtual-env-name
 ```
+
 2. Add `multi-area-cleaned` to path
 
 ```
@@ -26,6 +27,7 @@ $ add2virtualenv /path/to/multi-area-cleaned/pycog
 ```
 pip install -r requirements.txt
 ```
+This step installs everything from jupyter notebook to matplotlib for plotting. Note these will be done inside your virtual environment and will not disrupt your base python installation.
 
 When you are finished working in the virtual environment, run:
 ```
@@ -33,7 +35,7 @@ $ deactivate
 ```
 
 # Examples
-To generate the figures for the paper, run the following Jupyter notebooks. For `Revision_main.ipynb` and `Revision_exemplar`, most of the cells rely on saved data and can be run immediately. `Dynamics_polished` should run in about 15 minutes.
+To generate the figures for the paper, run the following Jupyter notebooks. For `Revision_main.ipynb` and `Revision_exemplar.ipynb`, most of the cells rely on saved data and can be run immediately. Generating the PSTHs and PC plots takes a bit of time. `Dynamics_polished` should run in about 5 minutes. You may get occassional matplotlib warnings, but these can be generally be ignored.
 
 ```
 sims/Revision_main.ipynb
