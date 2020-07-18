@@ -32,7 +32,7 @@ pip install -r requirements.txt
 This step installs everything from jupyter notebook to matplotlib for plotting. Note these will be done inside your virtual environment and will not disrupt your base python installation.
 
 # Examples
-To generate the figures for the paper, run the following Jupyter notebooks. For `Revision_main.ipynb` and `Revision_exemplar.ipynb`, most of the cells rely on saved data and can be run immediately. Generating the PSTHs and PC plots takes a bit of time. `Dynamics_polished` should run in about 5 minutes. You may get occassional matplotlib warnings, but these can generally be ignored.
+To generate the figures for the paper, run the following Jupyter notebooks. For `Revision_main.ipynb` and `Revision_exemplar.ipynb`, most of the cells rely on saved data and can be run immediately. Generating the PSTHs and PC plots takes a bit of time. `Dynamics_polished.ipynb` should run in about 5 minutes. You may get occassional matplotlib warnings, but these can generally be ignored.
 
 ```
 sims/Revision_main.ipynb
