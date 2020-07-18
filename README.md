@@ -35,7 +35,7 @@ $ deactivate
 ```
 
 # Examples
-To generate the figures for the paper, run the following Jupyter notebooks. For `Revision_main.ipynb` and `Revision_exemplar.ipynb`, most of the cells rely on saved data and can be run immediately. Generating the PSTHs and PC plots takes a bit of time. `Dynamics_polished` should run in about 5 minutes. You may get occassional matplotlib warnings, but these can be generally be ignored.
+To generate the figures for the paper, run the following Jupyter notebooks. For `Revision_main.ipynb` and `Revision_exemplar.ipynb`, most of the cells rely on saved data and can be run immediately. Generating the PSTHs and PC plots takes a bit of time. `Dynamics_polished` should run in about 5 minutes. You may get occassional matplotlib warnings, but these can generally be ignored.
 
 ```
 sims/Revision_main.ipynb
