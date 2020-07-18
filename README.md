@@ -24,6 +24,7 @@ $ add2virtualenv /path/to/multi-area-cleaned/pycog
 ```
 
 3. Install the dependencies
+
 In the main directory, run:
 ```
 pip install -r requirements.txt
