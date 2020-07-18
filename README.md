@@ -12,8 +12,6 @@ This should take only a couple minutes on a local computer.
 
 ```
 $ pip install virtualenvwrapper
-$ export WORKON_HOME=~/Envs
-$ mkdir -p $WORKON_HOME
 $ source /usr/local/bin/virtualenvwrapper.sh
 $ mkvirtualenv -p python2.7 your-virtual-env-name
 ```
