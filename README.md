@@ -12,6 +12,9 @@ This should take only a couple minutes on a local computer.
 
 ```
 $ pip install virtualenvwrapper
+$ export WORKON_HOME=~/Envs
+$ mkdir -p $WORKON_HOME
+$ source /usr/local/bin/virtualenvwrapper.sh
 $ mkvirtualenv -p python2.7 your-virtual-env-name
 ```
 2. Add `multi-area-cleaned` to path
@@ -40,7 +43,7 @@ sims/Revision_exemplar.ipynb
 sims/dynamics_polished.ipynb
 ```
 
-These `sims/Revision_main.ipynb` uses saved values for the hyperparameter sweeps. The mutual information and dpca variance values are generated using:
+These `sims/Revision_main.ipynb` uses saved values for the hyperparameter sweeps. The mutual information and dpca variance values are generated using the following files. Note that these scripts take a few hours to run.
 
 ```
 ./sims/get_mutualinfo_vals.sh
