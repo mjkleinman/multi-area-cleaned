@@ -16,6 +16,8 @@ $ source /usr/local/bin/virtualenvwrapper.sh
 $ mkvirtualenv -p python2.7 your-virtual-env-name
 ```
 
+You may have to change the path to virtualenvwrapper.sh depending where it was installed by pip.
+
 2. Add `multi-area-cleaned` to path
 
 ```
