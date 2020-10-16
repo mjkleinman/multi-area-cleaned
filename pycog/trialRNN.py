@@ -1075,7 +1075,7 @@ class PSTH(Trial):
     # ================================================
     # Sort trials according to a useful categorization
     # ================================================
-    def sort_trials(self, threshold=1, rt_bin=25):
+    def sort_trials(self, threshold=1, rt_bin=25, onlyCorrect = False):
         # threshold is the number of trials needed in a condition to actually append it.
         # The function sorts by self.sort.  self.sort can be a list of how to sort, and will sort in that order.
         #   - Note, the newest version of sort_trials only sorts by giving you the indices of the desired condition.
@@ -1107,13 +1107,19 @@ class PSTH(Trial):
 
             one_cond['idxs']    = np.where([np.all(zip_cond == cond) for zip_cond in zip_conds])[0]
 
+            # keep only correct
+            if onlyCorrect:
+                one_cond['idxs'] = [idx for idx in one_cond['idxs'] if self.trials[idx]['dir'] == self.trials[idx]['info']['choice']]
+
+            # pdb.set_trace()
+
             if len(one_cond['idxs']) > threshold:
                 sorted_trials.append(one_cond)
             else:
                 print '{} condition {} did not have at least {} trials, so it was discarded.'.format(str(self.sort), str(cond), str(threshold))
 
         # sorted_trials is a list, where each entry of the list is a dict containing the identifier 'cond' and 'trials'.
-        #pdb.set_trace()
+
         return np.array(sorted_trials)
 
 
@@ -1164,14 +1170,14 @@ class PSTH(Trial):
     # Generates the PSTHs
     # ===================
 
-    def gen_psth(self, field='r', threshold=1, rt_bin=25):
+    def gen_psth(self, field='r', threshold=1, rt_bin=25, onlyCorrect = False):
         # A few things need to happen here.
         # First we need to sort the trials.
         # Then we need to calculate the psths for each collection of trials
         # Then we'll store this as self.psth.
 
         # sort the trials
-        sorted_trials = self.sort_trials(threshold=threshold, rt_bin=rt_bin)
+        sorted_trials = self.sort_trials(threshold=threshold, rt_bin=rt_bin, onlyCorrect = onlyCorrect)
 
         # now calculate the PSTHs for each condition
         psth_collection = []
@@ -1816,11 +1822,11 @@ class Dynamics(PSTH):
     # Initialize
     # ==========
 
-    def __init__(self, rnnfile, modelfile, num_trials=100, seed=1, target_output=False, rnnparams={}, threshold=None, sort=['dirs', 'cohs'], align='cb', dims=np.array((0,1)), partition_pca=None):
+    def __init__(self, rnnfile, modelfile, num_trials=100, seed=1, target_output=False, rnnparams={}, threshold=None, sort=['dirs', 'cohs'], align='cb', dims=np.array((0,1)), partition_pca=None, onlyCorrect=False):
 
         # Init as a PSTH and generate them
         super(Dynamics, self).__init__(rnnfile, modelfile, num_trials, seed, target_output, rnnparams, threshold, sort, align)
-        self.gen_psth()
+        self.gen_psth(onlyCorrect=onlyCorrect)
 
         # Calculate the matrix to perform PCA on
         data    = np.hstack([one_psth['psth'] for one_psth in self.psths])
