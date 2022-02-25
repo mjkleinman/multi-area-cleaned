@@ -21,5 +21,10 @@ sims/revision/scratch_data/psths_dirs_coh.p
 sims/revision/exemplar_new/scratch_data/trials_dir_scol.p
 sims/revision/exemplar_new/scratch_data/psths_lrs_coh.p
 sims/revision/exemplar_new/scratch_data/psths_dirs_coh.p
+sims/revision/exemplar_new/scratch_data/
+sims/revision/scratch_data/
 *copy.pkl
 sims/Revision_main_development.ipynb
+sims/.ipynb_checkpoints/
+paper/
+sims/neurips/
