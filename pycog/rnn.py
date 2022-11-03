@@ -360,12 +360,12 @@ class RNN(object):
                 if np.any(var_in > 0):
                     noise_in = np.sqrt(var_in)*rng.normal(size=(Nt, Nin))
                     pdb.set_trace()
-
                 else:
                     noise_in = np.zeros((Nt, Nin))
             else:
                 noise_in = rng.multivariate_normal(np.zeros(Nin), var_in, Nt)
-                noise_in[:80, :] = 0 # mk 2020-05-03
+                if cfg_mk['remove_check_noise_before_cue']: #mk 2022-10-20 added this to config
+                    noise_in[:80, :] = 0 # mk 2020-05-03. Note, networks were trained with noise to checkerboard during this period, but this was helpful for visualizations, esp. for dpca IIRC.
             noise_in = np.asarray(noise_in, dtype=dtype)
 
         # Recurrent noise

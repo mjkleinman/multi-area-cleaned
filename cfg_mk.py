@@ -19,5 +19,7 @@ cfg_mk = {
     'random_mask_wout': False,  # default is False
     'make_positive': True,  # default is true (for training)
     'positive_ic': True,  # default is true
-    'make_positive_output': True  # default is true
-}
+    'make_positive_output': True,  # default is true, False for standard noDale
+
+    'remove_check_noise_before_cue': True # For analysis, esp dpca, removing noise before go cue (default True)
+    }

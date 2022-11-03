@@ -86,7 +86,8 @@ class Trial(object):
 
     dtype = np.float32
 
-    def __init__(self, rnnfile, modelfile, num_trials=100, seed=1, target_output=False, rnnparams={}, threshold=None, Wrec=None):
+    def __init__(self, rnnfile, modelfile, num_trials=100, seed=1, target_output=False, rnnparams={},
+                 threshold=None, Wrec=None, Wout=None):
         """
         Initialize the RNN from a saved training file.
 
@@ -116,6 +117,8 @@ class Trial(object):
         self.rnn        = RNN(rnnfile, rnnparams=rnnparams, verbose=False)
         if Wrec is not None:
             self.rnn.Wrec = Wrec
+        if Wout is not None:
+            self.rnn.Wout = Wout
         self.m          = imp.load_source('model', modelfile)
         self.ntrials    = num_trials * self.m.nconditions
         self.rng        = np.random.RandomState(seed)
@@ -533,7 +536,7 @@ class Trial(object):
     # ========================
     # Plots psychometric curve
     # ========================
-    def psychometric(self, savepath=None, filename=None):
+    def psychometric(self, savepath=None, filename=None, linecolor='black'):
 
         conds = self.conds
         correct_choices = np.array([trial['info']['choice'] for trial in self.trials])
@@ -553,22 +556,27 @@ class Trial(object):
             success_rates[i]    = np.sum(correct_choices[trialMask] == choices[trialMask]).astype(float) / len(trialMask)
             choose_red_rates[i] = np.sum(choose_red[trialMask]) / len(trialMask)
 
-        f   = plt.figure()
+        f   = plt.figure(figsize=(2,1.5))
         ax  = f.gca()
 
-        ax.plot(2*(u_conds / 225) - 1, choose_red_rates, marker='.', markersize=20)
-        ax.axvline(0, linestyle='--')
+        ax.plot(2*(u_conds / 225) - 1, choose_red_rates, marker='.', markersize=7.5, color=linecolor)
+        ax.axvline(0, linestyle='--', color=linecolor, linewidth=0.75)
+        ax.axhline(0.5, linestyle='--', color=linecolor, linewidth=0.75)
         ax.set_ylim((-0.05, 1.05))
         ax.set_xlim((-1.0, 1.0))
-        ax.set_xlabel('Checkerboard coherence')
-        ax.set_ylabel('Proportion of reaches to red target')
-        ax.set_title('Psychometric function for RNN checkerboard task')
+        ax.set_xlabel('Signed color coherence')
+        ax.set_ylabel('Prop reported red')
+
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+
+        # ax.set_title('Psychometric function for RNN checkerboard task')
 
         if filename is None:
             filename = 'psychometric'
 
         if savepath is not None:
-            f.savefig(savepath + filename + '.pdf')
+            f.savefig(savepath + filename + '.pdf', bbox_inches='tight')
 
         return (2*(u_conds / 225) - 1, choose_red_rates, success_rates)
         #return f
@@ -577,7 +585,7 @@ class Trial(object):
     # Plots reaction time vs cond
     # ===========================
 
-    def reaction_time(self, savepath=None, filename=None):
+    def reaction_time(self, savepath=None, filename=None, linecolor='black'):
 
         conds   = self.conds
         rts     = self.rts
@@ -589,19 +597,23 @@ class Trial(object):
             trialMask   = np.where(conds == cond)[0]
             rts_cond[i] = np.nanmean(rts[trialMask])
 
-        f   = plt.figure()
+        f = plt.figure(figsize=(2, 1.5))
         ax  = f.gca()
-        ax.plot(2*(u_conds / 225) - 1, rts_cond, marker='.', markersize=20)
+        ax.plot(2*(u_conds / 225) - 1, rts_cond, marker='.', markersize=7.5, color=linecolor)
+        # ax.axvline(0, linestyle='--', color=linecolor, linewidth=0.75)
         ax.set_xlim((-1.0, 1.0))
-        ax.set_xlabel('Checkerboard coherence')
-        ax.set_ylabel('Reaction time')
-        ax.set_title('Reaction time for RNN checkerboard task')
+        ax.set_xlabel('Signed color coherence')
+        ax.set_ylabel('Reaction time (ms)')
+
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        # ax.set_title('Reaction time for RNN checkerboard task')
 
         if filename is None:
             filename = 'reaction_time'
 
         if savepath is not None:
-            f.savefig(savepath + filename + '.pdf')
+            f.savefig(savepath + filename + '.pdf', bbox_inches='tight')
 
         return rts_cond
         #return f
@@ -696,14 +708,14 @@ class Trial(object):
         T   = self.trials[i]['info']['epochs']['T'] // self.dt
         Nin = len(self.trials[i]['u'])
         uu  = self.trials[i]['u']
-        uu  = uu[[2,1,0]]
+        uu  = uu[[3,2,1,0]]
 
         base, targ_on   = np.array(self.trials[i]['info']['epochs']['pre_targets']) // self.dt
         go, targ_off    = np.array(self.trials[i]['info']['epochs']['check']) // self.dt
 
         for j in np.arange(Nin):
             # Targ X highest
-            ax.plot(np.arange(0, T), tickOffset + j*sepY + uu[j][:-1], color='gray', linewidth=2)
+            ax.plot(np.arange(0, T), tickOffset + j*sepY + uu[j][:-1], color='green' if j % 2 == 0 else 'red', linewidth=2)
 
         # Remove borders
         ax.spines["top"].set_visible(False)
@@ -716,12 +728,12 @@ class Trial(object):
         ax.tick_params(axis='y', left='off', right='off', labelleft='off')
 
         # set the limits so you can see the bottom and top traces
-        ax.set_ylim([-0.11, sepY * (Nin - 1) + 0.11])
+        ax.set_ylim([-2, sepY * (Nin - 1) + 3])
 
         # Set labels
-        ax.text(-50, 0.5, 'Go cue', verticalalignment='center')
-        ax.text(-50, 2.5, 'Target\n$y$-position', verticalalignment='center')
-        ax.text(-50, 3.5, 'Target\n$x$-position', verticalalignment='center')
+        ax.text(-50, 0.5, 'CB Coherences', verticalalignment='center')
+        ax.text(-50, 5.5, 'Left Targ', verticalalignment='center')
+        ax.text(-50, 3.5, 'Right Targ', verticalalignment='center')
 
         # Plot the ticks for go-cue and targets on
         plt.xticks((base, targ_on, go, targ_off), ("Center hold", "Target on", "Go cue", "Target off"))
@@ -759,29 +771,31 @@ class Trial(object):
 
         for j in np.arange(Nout):
             # Targ X highest
-            handle, = ax.plot(np.arange(0, T), zz[j][:-1] - 2 * (j < 2), color=line_color, linewidth=2)
+            handle, = ax.plot(np.arange(0, T), zz[j][:-1] * (j < 2), color=line_color, linewidth=2,
+                              linestyle='dashed' if j == 0 else 'solid')
             handles.append(handle)
 
         # Remove borders
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
-        ax.spines["left"].set_visible(False)
+        # ax.spines["left"].set_visible(False)
         #ax.spines["bottom"].set_visible(False)
 
         # Remove ticks on top and right
         ax.tick_params(axis='x', bottom='on', top='off', labelbottom='on', direction='out')
-        ax.tick_params(axis='y', left='off', right='off', labelleft='off')
+        # ax.tick_params(axis='y', left='off', right='off', labelleft='off')
 
         # Plot the ticks for go-cue and targets on
         plt.xticks((base, targ_on, go, targ_off), ("Center hold", "Target on", "Go cue", "Target off"))
+        ax.set_ylabel('Decision Variable')
 
-        ax.text(0, np.mean(zz[0]) * 5, '$x$-position', verticalalignment='center')
-        ax.text(0, np.mean(zz[1]) * 5, '$y$-position', verticalalignment='center')
-        ax.text(0, np.mean(zz[0]) * 5 - 2, '$x$-velocity', verticalalignment='center')
-        ax.text(0, np.mean(zz[1]) * 5 - 2, '$y$-velocity', verticalalignment='center')
+        # ax.text(0, np.mean(zz[0]) * 5, '$x$-position', verticalalignment='center')
+        # ax.text(0, np.mean(zz[1]) * 5, '$y$-position', verticalalignment='center')
+        # ax.text(0, np.mean(zz[0]) * 5 - 2, '$x$-velocity', verticalalignment='center')
+        # ax.text(0, np.mean(zz[1]) * 5 - 2, '$y$-velocity', verticalalignment='center')
 
         if savepath is not None:
-            f.savefig(savepath + 'outputs.pdf')
+            f.savefig(savepath + 'outputs.pdf', bbox_inches='tight')
         if not display:
             f.clear()
 
@@ -819,12 +833,12 @@ class Trial(object):
         # Remove borders
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
-        ax.spines["left"].set_visible(False)
+        # ax.spines["left"].set_visible(False)
         #ax.spines["bottom"].set_visible(False)
 
         # Remove ticks on top and right
         ax.tick_params(axis='x', bottom='on', top='off', labelbottom='on', direction='out')
-        ax.tick_params(axis='y', left='off', right='off', labelleft='off')
+        # ax.tick_params(axis='y', left='off', right='off', labelleft='off')
 
         # set the limits so you can see the bottom and top traces
         ax.set_ylim([-0.11, sepY * (Nin) + 0.11])
@@ -836,7 +850,7 @@ class Trial(object):
 
         # Plot the ticks for go-cue and targets on
         plt.xticks((base, targ_on, switch, go, targ_off), ("Center hold", "Target\non",  "Switch", "Go cue", "Target\noff"))
-        plt.yticks(())
+        # plt.yticks(())
 
         if savepath is not None:
             f.savefig(savepath + filename)
@@ -982,13 +996,14 @@ class PSTH(Trial):
     # Initialize
     # ==========
 
-    def __init__(self, rnnfile, modelfile, num_trials=100, seed=1, target_output=False, rnnparams={}, threshold=None, sort=['dirs', 'cohs'], align='cb', Wrec=None):
+    def __init__(self, rnnfile, modelfile, num_trials=100, seed=1, target_output=False, rnnparams={},
+                 threshold=None, sort=['dirs', 'cohs'], align='cb', Wrec=None, Wout=None):
 
         # self.sort is a LIST of what to sort by.  If you wanted to sort only by 'coh', then set sort = ['coh'].  This is important to allow sorting by multiple features.
         self.sort       = sort
         self.align      = align
         self.psths      = None
-        super(PSTH, self).__init__(rnnfile, modelfile, num_trials, seed, target_output, rnnparams, threshold, Wrec)
+        super(PSTH, self).__init__(rnnfile, modelfile, num_trials, seed, target_output, rnnparams, threshold, Wrec, Wout)
         #if Wrec is not None:
         #    pdb.set_trace()
         #    self.rnn.Wrec = Wrec
