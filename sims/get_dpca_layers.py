@@ -2,6 +2,7 @@ import numpy as np
 from dPCA import dPCA
 from pycog.trialRNN import PSTH
 import os
+from cfg_mk import cfg_mk
 
 idx1 = np.hstack((np.arange(80), np.arange(240, 260)))
 idx2 = np.hstack((np.arange(80, 160), np.arange(260, 280)))
@@ -17,6 +18,7 @@ modelpath = cfg_mk['path'] + 'examples/models/cb_analyze_fixed-cb.py'
 cvar = np.zeros((8, 3))
 dvar = np.zeros((8, 3))
 xvar = np.zeros((8, 3))
+tvar = np.zeros((8, 3))
 for file_id in range(8):
     # filename_pkl = '2018-08-29_cb_3areas_ff0p1_fb0p05_seed=' + str(file_id) + '.pkl'
     filename_pkl = '2020-04-10_cb_simple_3areas_seed=' + str(file_id) + '.pkl'
@@ -39,21 +41,23 @@ for file_id in range(8):
             X2[:, :, i, j] = psths[i * num_cond2 + j]['psth'][idx2, 90:300]
             X3[:, :, i, j] = psths[i * num_cond2 + j]['psth'][idx3, 90:300]
 
-    dpca1 = dPCA.dPCA(labels='tdc', join={'td': ['d', 'td'], 'tc': ['c', 'tc'], 'tdc': ['dc', 'tdc']}, n_components=1)
-    dpca2 = dPCA.dPCA(labels='tdc', join={'td': ['d', 'td'], 'tc': ['c', 'tc'], 'tdc': ['dc', 'tdc']}, n_components=1)
-    dpca3 = dPCA.dPCA(labels='tdc', join={'td': ['d', 'td'], 'tc': ['c', 'tc'], 'tdc': ['dc', 'tdc']}, n_components=1)
+    dpca1 = dPCA.dPCA(labels='tdc', join={'td': ['d', 'td'], 'tc': ['c', 'tc'], 'tdc': ['dc', 'tdc'], 't': ['t']}, n_components=1)
+    dpca2 = dPCA.dPCA(labels='tdc', join={'td': ['d', 'td'], 'tc': ['c', 'tc'], 'tdc': ['dc', 'tdc'], 't': ['t']}, n_components=1)
+    dpca3 = dPCA.dPCA(labels='tdc', join={'td': ['d', 'td'], 'tc': ['c', 'tc'], 'tdc': ['dc', 'tdc'], 't': ['t']}, n_components=1)
     Z1 = dpca1.fit_transform(X1)
     Z2 = dpca2.fit_transform(X2)
     Z3 = dpca3.fit_transform(X3)
-    cvar[file_id, 0], dvar[file_id, 0], xvar[file_id, 0] = dpca1.calculate_variance(X1)
-    cvar[file_id, 1], dvar[file_id, 1], xvar[file_id, 1] = dpca2.calculate_variance(X2)
-    cvar[file_id, 2], dvar[file_id, 2], xvar[file_id, 2] = dpca3.calculate_variance(X3)
+    cvar[file_id, 0], dvar[file_id, 0], xvar[file_id, 0], tvar[file_id, 0] = dpca1.calculate_variance_withtime(X1)
+    cvar[file_id, 1], dvar[file_id, 1], xvar[file_id, 1], tvar[file_id, 1] = dpca2.calculate_variance_withtime(X2)
+    cvar[file_id, 2], dvar[file_id, 2], xvar[file_id, 2], tvar[file_id, 2] = dpca3.calculate_variance_withtime(X3)
 
 # save data
 # if rnnbase == '/Users/michael/Documents/GitHub/multi-area/saved_rnns_server_apr/data/2020-04-10_cb_simple_3areas/':
 #     data_save_path =
-data_save_path = cfg_mk['path'] + "sims/revision/scratch_data_dpca"
+# data_save_path = cfg_mk['path'] + "sims/revision/scratch_data_dpca"
+data_save_path = cfg_mk['path'] + "logs/scratch_data_dpca_nov18/" # MK
 os.chdir(data_save_path)
 np.save('dpca_layers_color.npy', cvar)
 np.save('dpca_layers_direction.npy', dvar)
 np.save('dpca_layers_context.npy', xvar)
+np.save('dpca_layers_time.npy', tvar) # MK Nov 18

@@ -991,6 +991,7 @@ class dPCA(BaseEstimator):
         col_var = None
         dir_var = None
         ctx_var = None
+        # time_var = None
         for key in self.P.keys():
             p = self.P[key]
             d = self.D[key]
@@ -1003,7 +1004,33 @@ class dPCA(BaseEstimator):
                 dir_var = frac_var
             if key == 'tdc':
                 ctx_var = frac_var
+            # if key == 't': # MK Nov 18
+            #     time_var = frac_var
         return col_var, dir_var, ctx_var
+
+    def calculate_variance_withtime(self, X):
+        Xr = X.reshape(X.shape[0], -1)
+        Xzm = - np.mean(Xr, axis=1).reshape(-1, 1) + Xr
+        var_tot = np.sum(Xzm ** 2)
+        col_var = None
+        dir_var = None
+        ctx_var = None
+        time_var = None
+        for key in self.P.keys():
+            p = self.P[key]
+            d = self.D[key]
+            var_dpca = np.sum((Xzm - p.dot(d.T.dot(Xzm))) ** 2)
+            frac_var = (var_tot - var_dpca) / var_tot
+            print(key + ' variance: ' + str(frac_var))
+            if key == 'tc':
+                col_var = frac_var
+            if key == 'td':
+                dir_var = frac_var
+            if key == 'tdc':
+                ctx_var = frac_var
+            if key == 't': # MK Nov 18
+                time_var = frac_var
+        return col_var, dir_var, ctx_var, time_var
 
     @staticmethod
     def getVariance_helper(p, d, Xzm, var_tot):

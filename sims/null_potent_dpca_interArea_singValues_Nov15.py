@@ -18,13 +18,15 @@ import re
 os.chdir(cfg_mk['rnn_datapath'])
 modelpath = cfg_mk['path'] + 'examples/models/cb_analyze_fixed-cb.py'
 NUM_UNITS = 100
+params = ['0p1'] #, '0p2', '0p3', '0p5', '1']
+NUM_PARAMS = len(params)
 
-overlap11_store = np.zeros((5, 8, 3, NUM_UNITS))
-overlap22_store = np.zeros((5, 8, 3, NUM_UNITS))
-overlap33_store = np.zeros((5, 8, 3, NUM_UNITS))
-sing11_store = np.zeros((5, 8, NUM_UNITS))
-sing22_store = np.zeros((5, 8, NUM_UNITS))
-sing33_store = np.zeros((5, 8, NUM_UNITS))
+overlap12_store = np.zeros((NUM_PARAMS, 8, 3, NUM_UNITS))
+overlap23_store = np.zeros((NUM_PARAMS, 8, 3, NUM_UNITS))
+# overlap33_store = np.zeros((NUM_PARAMS, 8, 3, NUM_UNITS))
+sing12_store = np.zeros((NUM_PARAMS, 8, NUM_UNITS))
+sing23_store = np.zeros((NUM_PARAMS, 8, NUM_UNITS))
+# sing33_store = np.zeros((NUM_PARAMS, 8, NUM_UNITS))
 area1_idx = list(range(0,80)) + list(range(240,260))
 area2_idx = list(range(80,160)) + list(range(260,280))
 area3_idx = list(range(160,240)) + list(range(280,300))
@@ -75,10 +77,6 @@ def getOverlap(dpca_axes, matrix):
 
     return overlap_store, s
 
-
-params = ['0p1', '0p2', '0p3', '0p5', '1']
-
-
 # for (file_id, this_file) in enumerate(all_files):
 for p, param in enumerate(params):
     for seed in range(8):
@@ -95,9 +93,9 @@ for p, param in enumerate(params):
         Win = psth.rnn.Win
         Wout = psth.rnn.Wout
         Wrec = psth.rnn.Wrec
-        W11 = Wrec[np.ix_(area1_idx, area1_idx)]  # To, From
-        W22 = Wrec[np.ix_(area2_idx, area2_idx)]
-        W33 = Wrec[np.ix_(area3_idx, area3_idx)]
+        W12 = Wrec[np.ix_(area2_idx, area1_idx)]  # To, From
+        W23 = Wrec[np.ix_(area3_idx, area2_idx)]
+        # W33 = Wrec[np.ix_(area3_idx, area3_idx)]
 
         # idx1 = np.hstack((np.arange(80)))
         # idx2 = np.hstack((np.arange(80, 160)))
@@ -111,29 +109,29 @@ for p, param in enumerate(params):
 
         X1 = np.zeros((len(area1_idx), 210, num_cond1, num_cond2))
         X2 = np.zeros((len(area2_idx), 210, num_cond1, num_cond2))
-        X3 = np.zeros((len(area3_idx), 210, num_cond1, num_cond2))
+        # X3 = np.zeros((len(area3_idx), 210, num_cond1, num_cond2))
         for i in range(num_cond1):
             for j in range(num_cond2):
                 X1[:, :, i, j] = psth.psths[i * num_cond2 + j]['psth'][area1_idx, 90:300]
                 X2[:, :, i, j] = psth.psths[i * num_cond2 + j]['psth'][area2_idx, 90:300]
-                X3[:, :, i, j] = psth.psths[i * num_cond2 + j]['psth'][area3_idx, 90:300]
+                # X3[:, :, i, j] = psth.psths[i * num_cond2 + j]['psth'][area3_idx, 90:300]
         dpca1 = dPCA.dPCA(labels='tdc', join={'td': ['d', 'td'], 'tc': ['c', 'tc'], 'tdc': ['dc', 'tdc']}, n_components=1)
         dpca2 = dPCA.dPCA(labels='tdc', join={'td': ['d', 'td'], 'tc': ['c', 'tc'], 'tdc': ['dc', 'tdc']}, n_components=1)
-        dpca3 = dPCA.dPCA(labels='tdc', join={'td': ['d', 'td'], 'tc': ['c', 'tc'], 'tdc': ['dc', 'tdc']}, n_components=1)
+        # dpca3 = dPCA.dPCA(labels='tdc', join={'td': ['d', 'td'], 'tc': ['c', 'tc'], 'tdc': ['dc', 'tdc']}, n_components=1)
         Z1 = dpca1.fit_transform(X1)
         Z2 = dpca2.fit_transform(X2)
-        Z3 = dpca3.fit_transform(X3)
+        # Z3 = dpca3.fit_transform(X3)
         dpca_axes1 = np.array([dpca1.P['tc'], dpca1.P['td']]).reshape(2, NUM_UNITS).T
         dpca_axes2 = np.array([dpca2.P['tc'], dpca2.P['td']]).reshape(2, NUM_UNITS).T
-        dpca_axes3 = np.array([dpca3.P['tc'], dpca3.P['td']]).reshape(2, NUM_UNITS).T
-        overlap11_store[p, seed, :, :], sing11_store[p, seed, :] = getOverlap(dpca_axes1, W11)
-        overlap22_store[p, seed, :, :], sing22_store[p, seed, :] = getOverlap(dpca_axes2, W22)
-        overlap33_store[p, seed, :, :], sing33_store[p, seed, :] = getOverlap(dpca_axes3, W33)
+        # dpca_axes3 = np.array([dpca3.P['tc'], dpca3.P['td']]).reshape(2, NUM_UNITS).T
+        overlap12_store[p, seed, :, :], sing12_store[p, seed, :] = getOverlap(dpca_axes1, W12)
+        overlap23_store[p, seed, :, :], sing23_store[p, seed, :] = getOverlap(dpca_axes2, W23)
+        # overlap33_store[p, seed, :, :], sing33_store[p, seed, :] = getOverlap(dpca_axes3, W33)
 
-savepath = cfg_mk['path'] + 'logs/dpca_intra_area_nov6/'
-np.save(savepath + 'null_potent_dpca_a11.npy', overlap11_store)
-np.save(savepath + 'null_potent_dpca_a22.npy', overlap22_store)
-np.save(savepath + 'null_potent_dpca_a33.npy', overlap33_store)
-np.save(savepath + 'sing_values_11.npy', sing11_store)
-np.save(savepath + 'sing_values_22.npy', sing22_store)
-np.save(savepath + 'sing_values_33.npy', sing33_store)
+savepath = cfg_mk['path'] + 'logs/dpca_inter_area_inhIncl_nov15/'
+np.save(savepath + 'null_potent_dpca_a12.npy', overlap12_store)
+np.save(savepath + 'null_potent_dpca_a23.npy', overlap23_store)
+# np.save(savepath + 'null_potent_dpca_a33.npy', overlap33_store)
+np.save(savepath + 'sing_values_12.npy', sing12_store)
+np.save(savepath + 'sing_values_23.npy', sing23_store)
+# np.save(savepath + 'sing_values_33.npy', sing33_store)
